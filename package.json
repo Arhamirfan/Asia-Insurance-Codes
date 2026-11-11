@@ -1,0 +1,25 @@
+{
+  "name": "asia-insurance-codes",
+  "version": "0.1.2",
+  "description": "Asia Insurance country and city code lookups",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:data": "node scripts/json-to-esm.mjs",
+    "test": "node --test"
+  }
+}
