@@ -13,6 +13,8 @@ export const norm = (s) =>
     .replace(/\s+/g, " ")
     .toLowerCase();
 
+// Codes are kept as strings ("01"); lookups key by numeric value so 1, "1" and "01" all match.
+// Safe: no two codes share a numeric value in the source data.
 export const num = (v) => (v === null || v === undefined || v === "" ? NaN : Number(v));
 export const byName = (a, b) => cmp(a.name, b.name);
 const cmp = new Intl.Collator().compare;
@@ -24,10 +26,10 @@ const ALIASES = {
   uk: 52, "great britain": 52, britain: 52, czechia: 64, turkiye: 87,
 };
 
-const countryByCode = new Map(countries.map((c) => [c.code, c]));
+const countryByCode = new Map(countries.map((c) => [num(c.code), c]));
 const countryByName = new Map();
 for (const c of countries) if (!countryByName.has(norm(c.name))) countryByName.set(norm(c.name), c);
-for (const [alias, code] of Object.entries(ALIASES)) countryByName.set(alias, countryByCode.get(code));
+for (const [alias, code] of Object.entries(ALIASES)) countryByName.set(alias, countryByCode.get(num(code)));
 
 const sortedCountries = [...countries].sort(byName);
 

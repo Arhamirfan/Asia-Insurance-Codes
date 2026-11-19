@@ -5,16 +5,16 @@ import {
 } from "../src/index.js";
 
 test("countries", () => {
-  assert.deepEqual(getCountryByCode(1), { code: 1, name: "PAKISTAN" });
+  assert.deepEqual(getCountryByCode(1), { code: "01", name: "PAKISTAN" });
   assert.equal(getCountryByCode("2").name, "INDIA");
-  assert.equal(findCountry("  india ")?.code, 2);
+  assert.equal(findCountry("  india ")?.code, "02");
   assert.equal(findCountry("Atlantis"), undefined);
 });
 
 test("cities by code and name", () => {
   assert.equal(getCityByCode(4704).name, "AALBORG");
   assert.equal(getCityByCode(9495), undefined); // nameless row dropped
-  assert.equal(findCity("aalborg")?.countryCode, 26);
+  assert.equal(findCity("aalborg")?.countryCode, "26");
 });
 
 test("duplicate names resolve by country", () => {
@@ -27,7 +27,7 @@ test("duplicate names resolve by country", () => {
 
 test("getCities", () => {
   const list = getCities(26);
-  assert.ok(list.length > 0 && list.every((c) => c.countryCode === 26));
+  assert.ok(list.length > 0 && list.every((c) => c.countryCode === "26"));
   assert.deepEqual(getCities("26"), list);
   const known = new Set(countries.map((c) => c.code));
   const orphan = cities.find((c) => c.countryCode !== null && !known.has(c.countryCode));
@@ -60,15 +60,15 @@ test("country by name instead of code, any case/spacing/punctuation", () => {
   for (const input of ["denmark", "DENMARK", "  Denmark  ", { code: 26, name: "x" }]) {
     assert.deepEqual(getCities(input), byCode);
   }
-  assert.equal(findCountry("u.a.e")?.code, 74);
-  assert.equal(findCountry("UAE")?.code, 74);
+  assert.equal(findCountry("u.a.e")?.code, "74");
+  assert.equal(findCountry("UAE")?.code, "74");
   assert.deepEqual(getCities("Atlantis"), []);
 });
 
 test("real-world aliases map to Asia Insurance spellings", () => {
   const exp = { "hong kong": 113, netherlands: 25, holland: 46, singapore: 121, cambodia: 123,
     "united states": 85, "United Arab Emirates": 74, UK: 52, czechia: 64, turkiye: 87 };
-  for (const [name, code] of Object.entries(exp)) assert.equal(findCountry(name)?.code, code, name);
+  for (const [name, code] of Object.entries(exp)) assert.equal(findCountry(name)?.code, String(code), name);
 });
 
 test("accents are ignored in names", () => {
@@ -81,14 +81,14 @@ test("getCities is sorted by name", () => {
 });
 
 test("findCity accepts country name", () => {
-  assert.equal(findCity("aalborg", "denmark")?.code, 4704);
+  assert.equal(findCity("aalborg", "denmark")?.code, "4704");
   assert.equal(findCity("aalborg", "india"), undefined);
   assert.equal(findCity("aalborg", null), undefined);
 });
 
 test("searchCities autocomplete", () => {
   const r = searchCities("aal", { country: "denmark" });
-  assert.ok(r.length > 0 && r.length <= 20 && r.every((c) => c.countryCode === 26));
+  assert.ok(r.length > 0 && r.length <= 20 && r.every((c) => c.countryCode === "26"));
   assert.equal(r[0].name.toLowerCase().startsWith("aal"), true);
   assert.equal(searchCities("aal", { limit: 3 }).length, 3);
   assert.deepEqual(searchCities(""), []);
@@ -97,11 +97,11 @@ test("searchCities autocomplete", () => {
 });
 
 test("getCodes returns the values to send", () => {
-  assert.deepEqual(getCodes({ country: "Denmark", city: "aalborg" }), { countryCode: 26, cityCode: 4704 });
-  assert.deepEqual(getCodes({ country: "denmark" }), { countryCode: 26, cityCode: undefined });
-  assert.deepEqual(getCodes({ city: "aalborg" }), { countryCode: 26, cityCode: 4704 });
+  assert.deepEqual(getCodes({ country: "Denmark", city: "aalborg" }), { countryCode: "26", cityCode: "4704" });
+  assert.deepEqual(getCodes({ country: "denmark" }), { countryCode: "26", cityCode: undefined });
+  assert.deepEqual(getCodes({ city: "aalborg" }), { countryCode: "26", cityCode: "4704" });
   assert.deepEqual(getCodes({ country: "Atlantis", city: "aalborg" }), { countryCode: undefined, cityCode: undefined });
-  assert.deepEqual(getCodes({ country: 26, city: "nowhere" }), { countryCode: 26, cityCode: undefined });
+  assert.deepEqual(getCodes({ country: 26, city: "nowhere" }), { countryCode: "26", cityCode: undefined });
   assert.deepEqual(getCodes(), { countryCode: undefined, cityCode: undefined });
 });
 
@@ -114,7 +114,7 @@ test("getCountries: all countries sorted by name, from main and light entry", as
   list.pop(); // a copy: callers can't corrupt the next call
   assert.equal(getCountries().length, countries.length);
   assert.deepEqual(light.getCountries(), getCountries());
-  assert.equal(light.findCountry("uae")?.code, 74);
+  assert.equal(light.findCountry("uae")?.code, "74");
 });
 
 test("getCities optional limit", () => {
@@ -126,4 +126,16 @@ test("getCities optional limit", () => {
   assert.deepEqual(getCities("Atlantis", { limit: 5 }), []);
   getCities("denmark", { limit: 1 }).pop(); // a copy: internal list untouched
   assert.deepEqual(getCities("denmark"), all);
+});
+
+test("codes are the exact source strings, leading zeros kept", () => {
+  for (const x of [1, "1", "01"]) assert.equal(getCountryByCode(x).code, "01");
+  assert.equal(getCityByCode("014").code, "014");
+  assert.equal(getCityByCode(14).code, "014");
+  assert.ok(getCities("01").length > 0 && getCities("01").every((c) => c.countryCode === "01"));
+  assert.deepEqual(getCities(1), getCities("pakistan"));
+  assert.equal(getCodes({ country: "pakistan" }).countryCode, "01");
+  assert.equal(getCodes({ country: 8 }).countryCode, "08"); // code used by cities, missing from the country list
+  assert.equal(getCodes({ country: 999 }).countryCode, undefined);
+  assert.ok([...countries, ...cities].every((c) => typeof c.code === "string"));
 });

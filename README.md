@@ -6,7 +6,7 @@ Look up Asia Insurance country and city codes. Zero dependencies, works in Node 
 import { getCodes, getCities, findCity, findCountry, searchCities } from "asia-insurance-codes";
 
 // The values to send to Asia Insurance
-getCodes({ country: "denmark", city: "Aalborg" });   // { countryCode: 26, cityCode: 4704 }
+getCodes({ country: "denmark", city: "Aalborg" });   // { countryCode: "26", cityCode: "4704" }  (strings, exactly as Asia Insurance lists them: "01" keeps its zero)
 getCodes({ city: "Aalborg" });                       // country inferred from the city
 
 // A country can be a name or a code, anywhere a country is accepted
@@ -14,8 +14,8 @@ getCities("Denmark");        // cities of Denmark, sorted by name
 getCities(26);  getCities("26");
 getCities("Denmark", { limit: 50 }); // first 50 by name; omit limit for all
 
-findCity("Aalborg", "Denmark")?.code;   // 4704 (pass the country: names repeat across countries)
-findCountry("UAE")?.code;               // 74
+findCity("Aalborg", "Denmark")?.code;   // "4704" (pass the country: names repeat across countries)
+findCountry("UAE")?.code;               // "74"
 
 // Autocomplete for a city input (starts-with first, then contains; default limit 20)
 searchCities("aal", { country: "Denmark", limit: 10 });
@@ -29,7 +29,7 @@ The city list is ~535 KB, and any import from `asia-insurance-codes` loads it. I
 ```js
 import { getCountries } from "asia-insurance-codes/countries"; // no city data in your bundle
 
-getCountries(); // [{ code: 5, name: "AFGHANISTAN" }, ...] all 88, sorted by name
+getCountries(); // [{ code: "05", name: "AFGHANISTAN" }, ...] all 88, sorted by name
 // <select>{getCountries().map(c => <option key={c.code} value={c.code}>{c.name}</option>)}</select>
 ```
 
@@ -39,7 +39,7 @@ For cities, load them only when needed: `const { searchCities } = await import("
 ## Matching rules
 - Names ignore case, accents, punctuation and extra spaces: `"  u.a.e "` = `UAE`, `"a coruna"` = `A CORUÑA`.
 - Real-world spellings map to Asia Insurance's (HONGKONG, NETHERLAND, SINGAPURE, COMBODIA...): `Hong Kong`, `Singapore`, `Cambodia`, `UAE`, `United Arab Emirates`, `Netherlands`, `Holland`, `United States`, `USA`, `UK`, `Great Britain`, `Czechia`, `Turkiye`. Add more in `ALIASES` in `src/index.js`.
-- A country passed as digits (`26`, `"26"`) is a code; anything else is a name.
+- A country passed as digits (`26`, `"26"`, `"026"`) is a code; anything else is a name. Codes are returned as strings with leading zeros (`"01"`), but any lookup accepts `1`, `"1"` or `"01"`.
 - Not found: `undefined` (single lookups, and each field of `getCodes`) or `[]` (list lookups). Never throws.
 
 ## Data

@@ -1,4 +1,4 @@
-export type Country = { code: number; name: string };
+export type Country = { code: string; name: string };
 
 export const countries: readonly Country[];
 /** All countries sorted by name, e.g. for a dropdown. Returns a new array each call. */
