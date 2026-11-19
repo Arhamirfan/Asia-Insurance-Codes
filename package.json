@@ -1,6 +1,6 @@
 {
   "name": "asia-insurance-codes",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Asia Insurance country and city code lookups",
   "type": "module",
   "main": "./src/index.js",
@@ -9,6 +9,10 @@
     ".": {
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
+    },
+    "./countries": {
+      "types": "./src/country.d.ts",
+      "default": "./src/country.js"
     }
   },
   "files": [

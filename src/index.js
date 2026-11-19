@@ -1,36 +1,10 @@
-import countryRows from "./countries.js";
 import cityRows from "./cities.js";
+import { norm, num, byName, findCountry } from "./country.js";
 
-export const countries = Object.freeze(countryRows);
+export { countries, getCountries, getCountryByCode, findCountry } from "./country.js";
 export const cities = Object.freeze(cityRows);
 
-// Case, accents, punctuation and extra spaces don't matter: "  u.a.e " === "UAE", "Coruña" === "coruna".
-const norm = (s) =>
-  String(s ?? "")
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .replace(/[^\p{L}\p{N}\s]/gu, "")
-    .trim()
-    .replace(/\s+/g, " ")
-    .toLowerCase();
-
-// Asia Insurance spells some names oddly (HONGKONG, NETHERLAND, SINGAPURE, COMBODIA); real-world spellings map to their codes.
-const ALIASES = {
-  "united arab emirates": 74, "hong kong": 113, netherlands: 25, holland: 46, singapore: 121,
-  cambodia: 123, "united states": 85, "united states of america": 85, america: 85,
-  uk: 52, "great britain": 52, britain: 52, czechia: 64, turkiye: 87,
-};
-
-const num = (v) => (v === null || v === undefined || v === "" ? NaN : Number(v));
-const cmp = new Intl.Collator().compare;
-const byName = (a, b) => cmp(a.name, b.name);
-
-const countryByCode = new Map(countries.map((c) => [c.code, c]));
 const cityByCode = new Map(cities.map((c) => [c.code, c]));
-const countryByName = new Map();
-for (const c of countries) if (!countryByName.has(norm(c.name))) countryByName.set(norm(c.name), c);
-for (const [alias, code] of Object.entries(ALIASES)) countryByName.set(alias, countryByCode.get(code));
-
 const citiesByName = new Map();
 const citiesByCountry = new Map();
 const push = (m, k, v) => (m.get(k) ?? m.set(k, []).get(k)).push(v);
@@ -40,8 +14,6 @@ for (const c of cities) {
 }
 for (const list of citiesByCountry.values()) list.sort(byName);
 
-export const getCountryByCode = (code) => countryByCode.get(num(code));
-export const findCountry = (name) => countryByName.get(norm(name));
 export const getCityByCode = (code) => cityByCode.get(num(code));
 
 /** A country given as code (1, "1"), name ("india") or a Country object -> numeric code, else NaN. */

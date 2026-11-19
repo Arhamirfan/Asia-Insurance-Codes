@@ -104,3 +104,15 @@ test("getCodes returns the values to send", () => {
   assert.deepEqual(getCodes({ country: 26, city: "nowhere" }), { countryCode: 26, cityCode: undefined });
   assert.deepEqual(getCodes(), { countryCode: undefined, cityCode: undefined });
 });
+
+test("getCountries: all countries sorted by name, from main and light entry", async () => {
+  const { getCountries } = await import("../src/index.js");
+  const light = await import("asia-insurance-codes/countries");
+  const list = getCountries();
+  assert.equal(list.length, countries.length);
+  assert.deepEqual(list.map((c) => c.name), countries.map((c) => c.name).sort(new Intl.Collator().compare));
+  list.pop(); // a copy: callers can't corrupt the next call
+  assert.equal(getCountries().length, countries.length);
+  assert.deepEqual(light.getCountries(), getCountries());
+  assert.equal(light.findCountry("uae")?.code, 74);
+});

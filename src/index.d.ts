@@ -1,13 +1,12 @@
-export type Country = { code: number; name: string };
+import type { Country } from "./country.js";
+export type { Country } from "./country.js";
+export { countries, getCountries, getCountryByCode, findCountry } from "./country.js";
 export type City = { code: number; name: string; countryCode: number | null };
 /** A country as code (26 or "26"), name ("denmark", "U.A.E", "uae") or a Country object. */
 export type CountryInput = number | string | Country;
 
-export const countries: readonly Country[];
 export const cities: readonly City[];
 
-export function getCountryByCode(code: number | string): Country | undefined;
-export function findCountry(name: string): Country | undefined;
 export function getCityByCode(code: number | string): City | undefined;
 /** Without `country` returns the first match; names repeat across countries. */
 export function findCity(name: string, country?: CountryInput): City | undefined;

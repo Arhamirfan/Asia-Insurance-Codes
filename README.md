@@ -22,6 +22,19 @@ searchCities("aal", { country: "Denmark", limit: 10 });
 
 Also: `getCountryByCode`, `getCityByCode`, and the frozen arrays `countries` / `cities`.
 
+## Frontend: country dropdown without the city data
+The city list is ~535 KB, and any import from `asia-insurance-codes` loads it. If you only need countries (~3 KB), import from the subpath:
+
+```js
+import { getCountries } from "asia-insurance-codes/countries"; // no city data in your bundle
+
+getCountries(); // [{ code: 5, name: "AFGHANISTAN" }, ...] all 88, sorted by name
+// <select>{getCountries().map(c => <option key={c.code} value={c.code}>{c.name}</option>)}</select>
+```
+
+`asia-insurance-codes/countries` also exports `countries`, `getCountryByCode` and `findCountry`.
+For cities, load them only when needed: `const { searchCities } = await import("asia-insurance-codes")` (your bundler splits it into its own chunk), or do city lookups on your backend.
+
 ## Matching rules
 - Names ignore case, accents, punctuation and extra spaces: `"  u.a.e "` = `UAE`, `"a coruna"` = `A CORUÑA`.
 - Real-world spellings map to Asia Insurance's (HONGKONG, NETHERLAND, SINGAPURE, COMBODIA...): `Hong Kong`, `Singapore`, `Cambodia`, `UAE`, `United Arab Emirates`, `Netherlands`, `Holland`, `United States`, `USA`, `UK`, `Great Britain`, `Czechia`, `Turkiye`. Add more in `ALIASES` in `src/index.js`.
