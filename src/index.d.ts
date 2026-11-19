@@ -10,8 +10,8 @@ export const cities: readonly City[];
 export function getCityByCode(code: number | string): City | undefined;
 /** Without `country` returns the first match; names repeat across countries. */
 export function findCity(name: string, country?: CountryInput): City | undefined;
-/** Cities of a country, sorted by name. Unknown country -> []. */
-export function getCities(country: CountryInput): City[];
+/** Cities of a country, sorted by name; the first `limit` only when given. Unknown country -> []. */
+export function getCities(country: CountryInput, options?: { limit?: number }): City[];
 /** Autocomplete: starts-with matches first, then contains. Default limit 20. */
 export function searchCities(query: string, options?: { country?: CountryInput; limit?: number }): City[];
 /** The codes to send to Asia Insurance; each is undefined when not found. */

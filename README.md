@@ -12,6 +12,7 @@ getCodes({ city: "Aalborg" });                       // country inferred from th
 // A country can be a name or a code, anywhere a country is accepted
 getCities("Denmark");        // cities of Denmark, sorted by name
 getCities(26);  getCities("26");
+getCities("Denmark", { limit: 50 }); // first 50 by name; omit limit for all
 
 findCity("Aalborg", "Denmark")?.code;   // 4704 (pass the country: names repeat across countries)
 findCountry("UAE")?.code;               // 74

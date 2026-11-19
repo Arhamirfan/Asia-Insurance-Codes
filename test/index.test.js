@@ -116,3 +116,14 @@ test("getCountries: all countries sorted by name, from main and light entry", as
   assert.deepEqual(light.getCountries(), getCountries());
   assert.equal(light.findCountry("uae")?.code, 74);
 });
+
+test("getCities optional limit", () => {
+  const all = getCities("denmark");
+  assert.ok(all.length > 5);
+  assert.deepEqual(getCities("denmark", { limit: 5 }), all.slice(0, 5));
+  assert.deepEqual(getCities("denmark", {}), all);
+  assert.equal(getCities("denmark", { limit: 1e6 }).length, all.length);
+  assert.deepEqual(getCities("Atlantis", { limit: 5 }), []);
+  getCities("denmark", { limit: 1 }).pop(); // a copy: internal list untouched
+  assert.deepEqual(getCities("denmark"), all);
+});

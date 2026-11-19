@@ -23,7 +23,9 @@ function toCountryCode(country) {
   return findCountry(country)?.code ?? NaN;
 }
 
-export const getCities = (country) => [...(citiesByCountry.get(toCountryCode(country)) ?? [])];
+/** No limit -> all cities of the country. */
+export const getCities = (country, { limit } = {}) =>
+  (citiesByCountry.get(toCountryCode(country)) ?? []).slice(0, limit);
 
 export function findCity(name, country) {
   const list = citiesByName.get(norm(name)) ?? [];
